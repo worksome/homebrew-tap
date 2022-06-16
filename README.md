@@ -10,11 +10,14 @@ A custom cask collection for [Homebrew][link-homebrew].
 Via Homebrew
 
 ```shell
-# For all casks
+# For all casks and formulae
 $ brew tap worksome/tap
 
 # For a single cask
 $ brew install --cask worksome/tap/[package]
+
+# For a single formula
+$ brew install --formula worksome/tap/[package]
 ```
 
 ## Available Formulae
