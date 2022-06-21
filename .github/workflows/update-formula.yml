@@ -1,0 +1,68 @@
+name: Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'The lowercase name of the formula to update'
+        required: true
+      version:
+        description: 'The version or tag of the version to update to'
+        required: true
+      download-url:
+        description: 'The download URL to update to'
+        required: true
+
+jobs:
+  formula:
+    name: Formula
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Require Tap
+        run: brew tap worksome/tap
+
+      - name: Get Tap Path
+        id: tap-path
+        run: |
+          WORKSOME_TAP="$(brew --repo worksome/tap)"
+          echo "::set-output name=path::${WORKSOME_TAP}"
+          echo "Tap Path: ${WORKSOME_TAP}"
+
+      - name: Bump formula
+        run: |
+          brew bump-formula-pr --no-fork --no-browse --write-only --no-audit --force --url '${{ github.event.inputs.download-url }}' 'worksome/tap/${{ github.event.inputs.name }}'
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_DEVELOPER: '1'
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          name: id_ed25519
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Commit
+        run: |
+          # Move to Git directory
+          cd '${{ steps.tap-path.outputs.path }}'
+          
+          # Set up Git URL and pull
+          git remote set-url origin 'git@github.com:worksome/homebrew-tap'
+          git pull --rebase --autostash --set-upstream origin main
+          
+          # Set up Git credentials
+          git config user.name "Worksome Bot"
+          git config user.email "actions@github.com"
+          
+          # Commit and push changes
+          git add Formula/${{ github.event.inputs.name }}.rb
+          git commit -m "chore(${{ github.event.inputs.name }}): update to version ${{ github.event.inputs.version }}"
+          git push origin main
+          
+          # Move to workspace
+          cd '${{ env.GITHUB_WORKSPACE }}'
