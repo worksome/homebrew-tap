@@ -1,4 +1,4 @@
-name: Update
+name: Trigger Formula
 
 on:
   workflow_dispatch:
@@ -14,8 +14,8 @@ on:
         required: true
 
 jobs:
-  formula:
-    name: Formula
+  update:
+    name: Update
     runs-on: ubuntu-latest
     steps:
 
