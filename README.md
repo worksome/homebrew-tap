@@ -20,6 +20,10 @@ $ brew install --cask worksome/tap/[package]
 $ brew install --formula worksome/tap/[package]
 ```
 
+## Available Casks
+
+- [Worksome CLI](https://github.com/worksome/worksome-cli) ([source](./Casks/worksome.rb))
+
 ## Available Formulae
 
 - [Graphlint](https://github.com/worksome/graphlint) ([source](./Formula/graphlint.rb))
