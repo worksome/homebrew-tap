@@ -1,8 +1,8 @@
 class Graphlint < Formula
   desc "Static analysis tool for GraphQL"
   homepage "https://github.com/worksome/graphlint"
-  url "https://github.com/worksome/graphlint/releases/download/v0.13.0/graphlint"
-  sha256 "e047584a1c94d9c53c212aef138d9c679c9a8546c8b93636321a955694a80503"
+  url "https://github.com/worksome/graphlint/releases/download/v0.13.1/graphlint"
+  sha256 "1342756cbda0240787fecee8b909bc15034686bd2899c12ef42a87403cadab0c"
   license "MIT"
 
   depends_on "php"
