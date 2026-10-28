@@ -20,7 +20,7 @@ jobs:
     steps:
 
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@d482da0e602890d3160aade42e72c8556103bf04 # 2026.10.26.1
 
       - name: Require Tap
         run: brew tap worksome/tap
@@ -40,29 +40,23 @@ jobs:
           HOMEBREW_DEVELOPER: '1'
 
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+        uses: shimataro/ssh-key-action@87a8f067114a8ce263df83e9ed5c849953548bc3 # v2.8.1
         with:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           name: id_ed25519
           known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
 
+      - name: Set Git Remote
+        working-directory: ${{ steps.tap-path.outputs.path }}
+        run: git remote set-url origin 'git@github.com:worksome/homebrew-tap'
+
       - name: Commit
-        run: |
-          # Move to Git directory
-          cd '${{ steps.tap-path.outputs.path }}'
-          
-          # Set up Git URL and pull
-          git remote set-url origin 'git@github.com:worksome/homebrew-tap'
-          git pull --rebase --autostash --set-upstream origin main
-          
-          # Set up Git credentials
-          git config user.name "Worksome Bot"
-          git config user.email "actions@github.com"
-          
-          # Commit and push changes
-          git add Formula/${{ github.event.inputs.name }}.rb
-          git commit -m "chore(${{ github.event.inputs.name }}): update to version ${{ github.event.inputs.version }}"
-          git push origin main
-          
-          # Move to workspace
-          cd '${{ env.GITHUB_WORKSPACE }}'
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7.2.1
+        with:
+          repository: ${{ steps.tap-path.outputs.path }}
+          branch: main
+          file_pattern: Formula/${{ github.event.inputs.name }}.rb
+          commit_message: "chore(${{ github.event.inputs.name }}): update to version ${{ github.event.inputs.version }}"
+          commit_user_name: Worksome Bot
+          commit_user_email: actions@github.com
+          commit_author: Worksome Bot <actions@github.com>
